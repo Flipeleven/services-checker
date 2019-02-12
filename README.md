@@ -37,7 +37,7 @@ SMTP_EMAIL="someone@domain.com"
 SMTP_NICENAME="John Smith"
 SMTP_PASSWORD="abcde12345"
 ```
-4. Set the services you want to keep an eye on (by default it has mysql and apache2..you can add or take away whatever you need).
+4. Set the services you want to keep an eye on (by default it has **mysql** and **apache2**. You can add or take away whatever you need).
 5. Save your changes and exit.
 6. Create a cronjob as root by typing `sudo crontab -e` and add something like this, which runs every five minutes (adjust to your needs):
 ```
@@ -50,3 +50,11 @@ The script will check the status of each service. If the service is stopped, it 
 If the service does not start for some reason, it sends you an email telling you it was not started.
 
 After that, it will continue to try and start, but not send any more emails until the service is finally started.
+
+## Verification
+
+You can test if this works for you by manually stopping a service. For example:
+```
+$ sudo service mysql stop
+```
+If the script works, you should get an email the next time your cron job runs telling you that the service was successfully restarted.
