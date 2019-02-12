@@ -14,7 +14,7 @@ You need to have **mailx** installed on the server:
 1. Clone this repository into an appropriate scripts folder. For example:
 ```
 $ cd /usr/local/sbin/scripts
-$ git clone git@github.com:Flipeleven/services-checker.git
+$ git clone https://github.com/Flipeleven/services-checker.git
 $ cd services-checker
 ```
 2. Make sure only the root user can access the script, because you will be putting a password in there:
