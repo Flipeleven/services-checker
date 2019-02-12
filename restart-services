@@ -5,13 +5,21 @@
 ##it will start the service and send an email to you
 ##if the restart does not work, it sends an email and then exits
 
-##set the path ##this works for Ubuntu 14.04 and 16.04
+## uses Gmail SMTP, so your username/email and password should be for a Gmail-hosted account
+## requires mailx to be installed on the server (sudo apt-get install heirloom-mailx)
+
+## set the path ##this works for Ubuntu 14.04 and 16.04
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-##set your email address 
-EMAIL="email@yourdomain.com"
+## set email address to receive the message
+TO_EMAIL="you@example.com"
 
-##list your services you want to check
+## set SMTP authentication and name
+SMTP_EMAIL="someone@domain.com"
+SMTP_NICENAME="John Smith"
+SMTP_PASSWORD="abcde12345"
+
+## list your services you want to check
 SERVICES=( 'apache2' 'mysql' )
 
 #### OK. STOP EDITING ####
@@ -39,15 +47,15 @@ SERVICES=( 'apache2' 'mysql' )
    then
 
     ##REMOVE THE TMP FILE IF EXISTS###
-    if [ -f "/tmp/$i" ]; 
+    if [ -f "/tmp/$i" ];
     then
      rm /tmp/$i
     fi
 
     ##SEND AN EMAIL###
-    MESSAGE="$i was down, but I was able to restart it on $(hostname) $(date)  "
-    SUBJECT="$i was down -but restarted-  on $(hostname) $(date) "
-    echo $MESSAGE | mail -s "$SUBJECT" "$EMAIL"
+    MESSAGE="$i was down, but I was able to restart it on $(hostname) $(date)"
+    SUBJECT="$i was down but restarted on $(hostname) $(date)"
+    echo $MESSAGE | mailx -s "$SUBJECT" -S smtp-use-starttls -S ssl-verify=ignore -S smtp-auth=login -S smtp=smtp://smtp.gmail.com:587 -S from="$SMTP_EMAIL($SMTP_NICENAME)" -S smtp-auth-user=$SMTP_EMAIL -S smtp-auth-password=$SMTP_PASSWORD -S ssl-verify=ignore $TO_EMAIL
 
    else
     ##IF RESTART DID NOT WORK###
@@ -59,9 +67,11 @@ SERVICES=( 'apache2' 'mysql' )
      touch /tmp/$i
 
      ##SEND A DIFFERENT EMAIL###
-     MESSAGE="$i is down on $(hostname)  at $(date)  "
-     SUBJECT=" $i  down on $(hostname) $(date) "
-     echo $MESSAGE  " I tried to restart it, but it did not work"  | mail -s "$SUBJECT" "$EMAIL"
+     MESSAGE="$i is down on $(hostname) at $(date) (restart failed)"
+     SUBJECT=" $i is down on $(hostname) $(date)"
+     echo $MESSAGE | mailx -s "$SUBJECT" -S smtp-use-starttls -S ssl-verify=ignore -S smtp-auth=login -S smtp=smtp://smtp.gmail.com:587 -S from="$SMTP_EMAIL($SMTP_NICENAME)"
+ -S smtp-auth-user=$SMTP_EMAIL -S smtp-auth-password=$SMTP_PASSWORD -S ssl-verify=igno
+re $TO_EMAIL
     fi
   fi
  fi

@@ -1,22 +1,48 @@
-## Services Checker
+# Services Checker
 
-Bash Script to check if services are running and restart if not. Sends email to you.
-Tested with Ubuntu 14.04, 16.04 and 18.04.
+Bash Script to check if services are running and restart them if they are not. Sends an email to you if something happened.
 
-## Installation
+Tested with Ubuntu 14.04, 16.04 and 18.04. Gmail integration based on https://www.systutorials.com/1411/sending-email-from-mailx-command-in-linux-using-gmails-smtp/
 
-1. put it into your scripts folder
-2. set your email address
-3. set the services you want to keep an eye on (by default it has mysql and apache2..you can add or take away whatever you need)
-3. save your changes
-4. create a cronjob as root (sudo crontab -e)  and add something like this, which runs every minute (adjust to your needs):
+## Server Prerequisites
 
+You need to have **mailx** installed on the server:
+`sudo apt-get install heirloom-mailx`
 
+## Installation and Configuration
 
+1. Clone this repository into an appropriate scripts folder. For example:
+```
+$ cd /usr/local/sbin/scripts
+$ git clone git@github.com:Flipeleven/services-checker.git
+$ cd services-checker
+```
+2. Make sure only the root user can access the script, because you will be putting a password in there:
+```
+$ sudo chmod 700 restart-services
+$ ls -l
+```
+Make sure the listing shows root as the owner. Should look something like:
+```
+-rwx------ 1 root root 2274 Apr 12 17:30 restart-services
+```
+
+3. Open `restart-services` in a text editor and edit these lines:
+```
+## set email address to receive the message
+TO_EMAIL="you@example.com"
+
+## set SMTP authentication and name
+SMTP_EMAIL="someone@domain.com"
+SMTP_NICENAME="John Smith"
+SMTP_PASSWORD="abcde12345"
+```
+4. Set the services you want to keep an eye on (by default it has mysql and apache2..you can add or take away whatever you need).
+5. Save your changes and exit.
+6. Create a cronjob as root by typing `sudo crontab -e` and add something like this, which runs every five minutes (adjust to your needs):
 ```
 #check on services
-*/1 *  * * * /your/path/to/scripts/restart-services
-
+*/5 * * * * /usr/local/sbin/scripts/services-checker/restart-services
 ```
 
 The script will check the status of each service. If the service is stopped, it tries to restart the service. If the service starts, it sends you an email saying the service stopped but was restarted.
